@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33530.505
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "2DPixelGrid", "2DPixelGrid\2DPixelGrid.vcxproj", "{3504D6ED-832F-49DC-BA2A-F4A7C3FE42FB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3504D6ED-832F-49DC-BA2A-F4A7C3FE42FB}.Debug|x64.ActiveCfg = Debug|x64
+		{3504D6ED-832F-49DC-BA2A-F4A7C3FE42FB}.Debug|x64.Build.0 = Debug|x64
+		{3504D6ED-832F-49DC-BA2A-F4A7C3FE42FB}.Debug|x86.ActiveCfg = Debug|Win32
+		{3504D6ED-832F-49DC-BA2A-F4A7C3FE42FB}.Debug|x86.Build.0 = Debug|Win32
+		{3504D6ED-832F-49DC-BA2A-F4A7C3FE42FB}.Release|x64.ActiveCfg = Release|x64
+		{3504D6ED-832F-49DC-BA2A-F4A7C3FE42FB}.Release|x64.Build.0 = Release|x64
+		{3504D6ED-832F-49DC-BA2A-F4A7C3FE42FB}.Release|x86.ActiveCfg = Release|Win32
+		{3504D6ED-832F-49DC-BA2A-F4A7C3FE42FB}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {01D19981-E8C9-4FA5-8FFB-27BA77D6DFD6}
+	EndGlobalSection
+EndGlobal
