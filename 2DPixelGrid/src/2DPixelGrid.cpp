@@ -31,14 +31,23 @@ void menu(int index);
 
 void drawGrid(int num);
 void drawPoint(int x, int y, Color);
-void drawAllPoints(std::vector<Point>);
-void drawAllLines(std::vector<Point>);
+void drawAllPoints(std::vector<Point> points);
+void drawAllLines(std::vector<Point> lines);
+
+void drawAllTriangles(std::vector<Point> points);
+int drawPointCount = 0;
+
+void fillTriangle(Point p0, Point p1, Point p2);
+
+void findBoundingBox(Point p0, Point p1, Point p2, Point& topLeft, Point& bottomRight);
 
 void Line(Point p0, Point p1);
 
 void myKeyboardFunc(unsigned char Key, int x, int y);
 void myMouseFunc(int button, int state, int x, int y);
+void myTimerFunc(int value);
 
+int refreshMillis = 100;
 
 int gridNum = 10;
 
@@ -56,6 +65,7 @@ int px, py;
 
 std::vector<Point> points;
 std::vector<Point> lines;
+std::vector<Point> traingles;
 // std::vector<std::pair<Point, Point>> lines;
 
 enum {
@@ -81,6 +91,7 @@ int main(int argc, char** argv)
 
     glutReshapeFunc(ChangeSize);
     glutDisplayFunc(RenderScene);
+    glutTimerFunc(refreshMillis, myTimerFunc, 0);
 
     glutMainLoop();
     return 0;
@@ -115,9 +126,20 @@ void RenderScene(void)
     drawPoint(px, py, Color{1,0,0});
     drawAllPoints(points);
     drawAllLines(lines);
+    drawAllTriangles(traingles);
 
     fpsCounter->displayAndUpdateFPS(left * 0.9, top * 0.9);
     glutSwapBuffers();
+}
+
+void myTimerFunc(int value)
+{
+    if (drawPointCount < traingles.size())
+    {
+        drawPointCount++;
+    }
+    glutPostRedisplay();
+    glutTimerFunc(refreshMillis, myTimerFunc, 0);
 }
 
 // Create Menu
@@ -198,7 +220,7 @@ void drawPoint(int x, int y, Color color) {
     }
 }
 
-void drawAllPoints(std::vector<Point>) {
+void drawAllPoints(std::vector<Point> points) {
     glColor3f(1, 0, 0);
     glBegin(GL_LINE_STRIP);
     for (auto& point : points) {
@@ -212,7 +234,15 @@ void drawAllPoints(std::vector<Point>) {
     }
 }
 
-void drawAllLines(std::vector<Point>) {
+void drawAllTriangles(std::vector<Point> points) {
+    Color red{ 1, 0, 0 };
+    for (int i = 0; i < drawPointCount; i++)
+    {
+        drawPoint(points[i].x, points[i].y, red);
+    }
+}
+
+void drawAllLines(std::vector<Point> lines) {
     Color green { 0, 1, 0};
     Color blue  { 0, 0, 1};
     Point lastPoint = { 0, 0};
@@ -229,6 +259,47 @@ void drawAllLines(std::vector<Point>) {
         }
         lastPoint = point;
     }
+}
+
+// Function to calculate the line equation
+float lineEq(Point p1, Point p2, int x, int y) {
+    return (p2.y - p1.y) * x + (p1.x - p2.x) * y + (p2.x * p1.y - p1.x * p2.y);
+}
+
+void fillTriangle(Point p0, Point p1, Point p2) {
+    //Get the bounding box
+    Point max, min;
+    findBoundingBox(p0, p1, p2, max, min);
+
+    for (int y = min.y; y <= max.y; y++) {
+        for (int x = min.x; x <= max.x; x++) {
+            if (lineEq(p0, p1, x, y) < 0 && lineEq(p1, p2, x, y) < 0 && lineEq(p2, p0, x, y) < 0) {
+                traingles.push_back(Point{ x, y });
+                std::cout << "push" << std::endl;
+            }
+
+            else if (lineEq(p0, p1, x, y) > 0 && lineEq(p1, p2, x, y) > 0 && lineEq(p2, p0, x, y) > 0)
+            {
+                traingles.push_back(Point{ x, y });
+                std::cout << "push" << std::endl;
+            }
+        }
+    }
+}
+
+// Function to find the bounding box of the triangle
+void findBoundingBox(Point p0, Point p1, Point p2, Point& topRight, Point& bottomLeft) {
+    // Initialize min and max coordinates
+    int minX = std::min({ p0.x, p1.x, p2.x });
+    int minY = std::min({ p0.y, p1.y, p2.y });
+    int maxX = std::max({ p0.x, p1.x, p2.x });
+    int maxY = std::max({ p0.y, p1.y, p2.y });
+
+    // Update bounding box coordinates
+    topRight.x = maxX;
+    topRight.y = maxY;
+    bottomLeft.x = minX;
+    bottomLeft.y = minY;
 }
 
 
@@ -283,6 +354,7 @@ void myKeyboardFunc(unsigned char Key, int x, int y) {
         std::cout << "clean!" << std::endl;
         lines.clear();
         points.clear();
+        traingles.clear();
         break;
     }
 }
@@ -314,6 +386,12 @@ void myMouseFunc(int button, int state, int x, int y) {
         if (points.size() >= 2)
         {
             Line(points[points.size() - 2], points[points.size() - 1]);
+        }
+
+        if (points.size() >= 4)
+        {
+            fillTriangle(points[points.size() - 3], points[points.size() - 2], points[points.size() - 1]);
+            std::cout << "Triangle" << std::endl;
         }
     }
     else if (state == GLUT_UP) {
