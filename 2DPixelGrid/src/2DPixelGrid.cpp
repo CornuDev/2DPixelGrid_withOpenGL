@@ -13,7 +13,10 @@
 #include "FPSCounter.h"
 
 #define PI 3.14159265
+
 int lineCount = 0;
+
+
 
 struct Color {
     float r;
@@ -29,6 +32,7 @@ struct Point {
     Color color;
 
     Point(float x = 0, float y = 0, Color color = Color()) : x(x), y(y), color(color) {}
+    
     bool operator==(const Point& other) const {
         return x == other.x && y == other.y;
     }
@@ -61,7 +65,6 @@ void increment(Point* edge, Point* delta);
 
 Color generateRandomColor();
 Color interpolateColor(const Color& startColor, const Color& endColor, float factor);
-Color getMiddleColor(float x, float y);
 bool isLoop = false;
 
 void myKeyboardFunc(unsigned char Key, int x, int y);
@@ -86,7 +89,7 @@ float px, py;
 
 std::vector<Point> vertices;
 std::vector<Point> lines;
-std::vector<Point> innerPoints;
+std::vector<Point> innerPoints; 
 // std::vector<std::pair<Point, Point>> lines;
 
 enum {
@@ -368,6 +371,7 @@ void myKeyboardFunc(unsigned char Key, int x, int y) {
         lines.clear();
         vertices.clear();
         innerPoints.clear();
+        isLoop = false;
         break;
     }
 }
@@ -525,9 +529,10 @@ void scanX(Point* l, Point* r, int y)
         differenceX(l, r, &s, &ds, lx);
         for (x = lx; x < rx; x++)
         {
-            float factor = (x - lx) / (rx - lx);
-            Color currentColor = interpolateColor(l->color, r->color, factor);
-            innerPoints.push_back(Point{ x, float(y), currentColor});
+            //float factor = (x - lx) / (rx - lx);
+            //Color currentColor = interpolateColor(l->color, r->color, factor);
+            //innerPoints.push_back(Point{ x, float(y), currentColor});
+            innerPoints.push_back(Point{ x, float(y), Color{s.color.r, s.color.g, s.color.b}});
             increment(&s, &ds);
         }
     }
@@ -548,6 +553,7 @@ Color generateRandomColor()
         static_cast<float>(rand()) / RAND_MAX);
 }
 
+
 Color interpolateColor(const Color& startColor, const Color& endColor, float factor)
 {
     return Color{
@@ -556,3 +562,4 @@ Color interpolateColor(const Color& startColor, const Color& endColor, float fac
         startColor.b + factor * (endColor.b - startColor.b)
     };
 }
+
