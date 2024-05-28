@@ -44,23 +44,22 @@ void createMenu();
 void menu(int index);
 
 void drawGrid(int num);
-void drawPoint(int x, int y, Color);
-void drawAllVertices(std::vector<Point> vertices);
-void drawAllLines(std::vector<Point> lines);
-
-void drawInnerPoints(std::vector<Point> points);
+void drawPoint(const Point& point);
+void drawAllVertices(const std::vector<Point>& vertices);
+void drawAllLines(const std::vector<Point>& lines);
+void drawInnerPoints(const std::vector<Point>& points);
 int drawPointCount = 0;
 
 void findBoundingBox(Point p0, Point p1, Point p2, Point& topLeft, Point& bottomRight);
 
-void Line(Point p0, Point p1);
+void Line(const Point& p0, const Point& p1);
 
-void crow(std::vector<Point> vertices);
-void scanY(std::vector<Point> vertices, int n, int i);
+void crow(const std::vector<Point>& vertices);
+void scanY(const std::vector<Point>& vertices, int n, int i);
 void scanX(Point* l, Point* r, int y);
-void differenceY(Point* v1, Point* v2, Point* e, Point* de, int y);
-void differenceX(Point* v1, Point* v2, Point* e, Point* de, int x);
-void difference(Point* v1, Point* v2, Point* e, Point* de, float d, float f);
+void differenceY(const Point* v1, const Point* v2, Point* e, Point* de, int y);
+void differenceX(const Point* v1, const Point* v2, Point* e, Point* de, int x);
+void difference(const Point* v1, const Point* v2, Point* e, Point* de, float d, float f);
 void increment(Point* edge, Point* delta);
 
 Color generateRandomColor();
@@ -71,7 +70,7 @@ void myKeyboardFunc(unsigned char Key, int x, int y);
 void myMouseFunc(int button, int state, int x, int y);
 void myTimerFunc(int value);
 
-int refreshMillis = 100;
+int refreshMillis = 12;
 
 int gridNum = 10;
 
@@ -234,10 +233,17 @@ void drawGrid(int num) {
 }
 
 
-void drawPoint(int x, int y, Color color) {
-    if (x <= gridNum && x > -gridNum && y > -gridNum && y <= gridNum)
+void drawPoint(const Point& point) {
+    int x = point.x;
+    int y = point.y;
+    float r = point.color.r;
+    float g = point.color.g;
+    float b = point.color.b;
+
+    if (point.x <= gridNum && point.x > -gridNum && point.y > -gridNum && point.y <= gridNum)
     {
-        glColor3f(color.r, color.g, color.b);
+        
+        glColor3f(r, g, b);
         glBegin(GL_QUADS);
         glVertex2f(x - 1, y - 1);
         glVertex2f(x, y - 1);
@@ -247,7 +253,7 @@ void drawPoint(int x, int y, Color color) {
     }
 }
 
-void drawAllVertices(std::vector<Point> vertices) {
+void drawAllVertices(const std::vector<Point>& vertices) {
     //drawLinks
     if (vertices.size() > 1) 
     {
@@ -261,23 +267,23 @@ void drawAllVertices(std::vector<Point> vertices) {
     }
     //drawVertices
     for (auto& point : vertices) {
-        drawPoint(point.x, point.y, point.color);
+        drawPoint(point);
     }
 }
 
-void drawInnerPoints(std::vector<Point> points) {
+void drawInnerPoints(const std::vector<Point>& points) {
     for (int i = 0; i < drawPointCount; i++)
     {
-        drawPoint(points[i].x, points[i].y, points[i].color);
+        drawPoint(points[i]);
     }
 }
 
-void drawAllLines(std::vector<Point> lines) {
-    Color green { 0, 1, 0};
-    Color blue  { 0, 0, 1};
-    Point lastPoint = { 0, 0};
+void drawAllLines(const std::vector<Point>& lines) {
+    //Color green { 0, 1, 0};
+    //Color blue  { 0, 0, 1};
+    //Point lastPoint = { 0, 0};
     for (auto& point : lines) {
-        drawPoint(point.x, point.y, point.color);
+        drawPoint(point);
         /*
         if (lastPoint.x == point.x || lastPoint.y == point.y)
         {
@@ -295,27 +301,21 @@ void drawAllLines(std::vector<Point> lines) {
 }
 
 // Function to calculate the line equation
-float lineEq(Point p1, Point p2, int x, int y) {
+float lineEq(const Point& p1, const Point& p2, int x, int y) {
     return (p2.y - p1.y) * x + (p1.x - p2.x) * y + (p2.x * p1.y - p1.x * p2.y);
 }
 
 // Function to find the bounding box of the triangle
 void findBoundingBox(Point p0, Point p1, Point p2, Point& topRight, Point& bottomLeft) {
     // Initialize min and max coordinates
-    int minX = std::min({ p0.x, p1.x, p2.x });
-    int minY = std::min({ p0.y, p1.y, p2.y });
-    int maxX = std::max({ p0.x, p1.x, p2.x });
-    int maxY = std::max({ p0.y, p1.y, p2.y });
-
-    // Update bounding box coordinates
-    topRight.x = maxX;
-    topRight.y = maxY;
-    bottomLeft.x = minX;
-    bottomLeft.y = minY;
+    bottomLeft.x = std::min({ p0.x, p1.x, p2.x });
+    bottomLeft.y = std::min({ p0.y, p1.y, p2.y });
+    topRight.x = std::max({ p0.x, p1.x, p2.x });
+    topRight.y = std::max({ p0.y, p1.y, p2.y });
 }
 
 
-void Line(Point p0, Point p1) {
+void Line(const Point& p0, const Point& p1) {
     lineCount++;
     float distance = sqrt((p1.x - p0.x) * (p1.x - p0.x) + (p1.y - p0.y) * (p1.y - p0.y));
 
@@ -422,7 +422,7 @@ void myMouseFunc(int button, int state, int x, int y) {
     }
 }
 
-void crow(std::vector<Point> vertices) 
+void crow(const std::vector<Point>& vertices) 
 {
     //Step1 : Find the vertex with the smallest y value to start
     int iMin = 0;
@@ -436,7 +436,7 @@ void crow(std::vector<Point> vertices)
     scanY(vertices, n, iMin);
 }
 
-void scanY(std::vector<Point> vertices, int n, int i)
+void scanY(const std::vector<Point>& vertices, int n, int i)
 {
     // Step2 : Scan upward maintaining the active edge list
 
@@ -491,17 +491,17 @@ void scanY(std::vector<Point> vertices, int n, int i)
     }
 }
 
-void differenceY(Point* v1, Point* v2, Point* e, Point * de, int y)
+void differenceY(const Point* v1, const Point* v2, Point* e, Point * de, int y)
 {
     difference(v1, v2, e, de, float(v2->y - v1->y), float(y - v1->y));
 }
 
-void differenceX(Point* v1, Point* v2, Point* e, Point* de, int x)
+void differenceX(const Point* v1, const Point* v2, Point* e, Point* de, int x)
 {
     difference(v1, v2, e, de, float(v2->x - v1->x), float(x - v1->x));
 }
 
-void difference(Point* v1, Point* v2, Point* e, Point* de, float d, float f)
+void difference(const Point* v1, const Point* v2, Point* e, Point* de, float d, float f)
 {
     de->x = (v2->x - v1->x) / d;
     e->x = v1->x + f * de->x;
